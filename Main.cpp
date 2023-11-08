@@ -5,7 +5,7 @@
 
 int main(){
     MonteCarlo run1;
-    run1.processPortfolio();
-
+    run1.runMonteCarlo();
+    
     return 1;
 }

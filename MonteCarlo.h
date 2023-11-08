@@ -5,18 +5,11 @@
 #ifndef PARAPET_PROJECT_MONTECARLO_H
 #define PARAPET_PROJECT_MONTECARLO_H
 #include <string>
+#include "ProcessPortfolio.h"
 
-
-class MonteCarlo {
+class MonteCarlo : ProcessPortfolio{
 public:
-    struct Investment {
-        std::string name;
-        double rateOfReturn;
-        double stdDeviation;
-        double portionOfPortfolio;
-    };
-    void processPortfolio();
-    double portfolioReturn;
-    double portfolioStdDev;
+    void runMonteCarlo();
+
 };
 #endif //PARAPET_PROJECT_MONTECARLO_H

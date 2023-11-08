@@ -4,12 +4,14 @@
 
 #ifndef PARAPET_PROJECT_PARAPETRUN_H
 #define PARAPET_PROJECT_PARAPETRUN_H
+#include <string>
 
-
-#include "MonteCarlo.h"
-
-class ParapetRun : MonteCarlo {
-
+class ParapetRun{
+public:
+    void scenarioBuilder();
+    double spendingLevel;
+    double portfolioValue;
+    std::string filePath;
 };
 
 

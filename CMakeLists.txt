@@ -14,4 +14,6 @@ add_executable(Parapet_Project
         MonteCarlo.h
         Main.cpp
         ParapetRun.cpp
-        ParapetRun.h)
+        ParapetRun.h
+        ProcessPortfolio.cpp
+        ProcessPortfolio.h)
