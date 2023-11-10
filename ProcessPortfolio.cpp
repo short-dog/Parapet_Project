@@ -20,10 +20,10 @@ struct Investment {
 
 void ProcessPortfolio::processPortfolio() {
 
-    ParapetRun::scenarioBuilder();
+    ScenarioBuilder::scenarioBuilder();
     // Retrieving User Portfolio and Formatting it //
     // Retrieving the portfolio from a CSV file
-    std::ifstream file(ParapetRun::filePath);
+    std::ifstream file(ScenarioBuilder::filePath);
     if (!file.is_open()) {
         std::cerr << "Error: Could not open file." << std::endl;
     }
@@ -80,6 +80,6 @@ void ProcessPortfolio::processPortfolio() {
     //establishing portfolio parameters for Monte Carlo Simulation
     minMC = portfolioReturn - portfolioStdDev;
     maxMC = portfolioReturn + portfolioStdDev;
-    portfolioValue = ParapetRun::portfolioValue;
+    portfolioValue = ScenarioBuilder::portfolioValue;
 
 }

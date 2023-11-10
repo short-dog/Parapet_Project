@@ -4,9 +4,9 @@
 
 #ifndef PARAPET_PROJECT_PROCESSPORTFOLIO_H
 #define PARAPET_PROJECT_PROCESSPORTFOLIO_H
-#include "ParapetRun.h"
+#include "ScenarioBuilder.h"
 
-class ProcessPortfolio : ParapetRun {
+class ProcessPortfolio : ScenarioBuilder {
 public:
     struct Investment {
         std::string name;
