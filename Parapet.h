@@ -14,13 +14,15 @@ public:
     void runMonteCarlo();
     void calculateSuccess();
 
+    std::string filePath;
     double monthlySpending;
     double initialPortfolioValue;
     double yearlyAddition;
     int planStartAge;
     int retirementAge;
+
+private:
     int planLength;
-    std::string filePath;
 
     double portfolioReturn;
     double portfolioStdDev;
