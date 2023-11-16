@@ -10,10 +10,6 @@ add_executable(Parapet_Project
         .idea/modules.xml
         ".idea/Parapet Project.iml"
         .idea/workspace.xml
-        MonteCarlo.cpp
-        MonteCarlo.h
         Main.cpp
-        ParapetRun.cpp
-        ParapetRun.h
-        ProcessPortfolio.cpp
-        ProcessPortfolio.h)
+        Parapet.cpp
+        Parapet.h)
