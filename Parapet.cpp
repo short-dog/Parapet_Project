@@ -3,7 +3,6 @@
 //
 
 #include "Parapet.h"
-#include <chrono>
 #include <iostream>
 #include <cmath>
 #include <fstream>
@@ -162,7 +161,4 @@ void Parapet::calculateSuccess() {
     }
     const double successProbability = 100 * (static_cast<double>(successCount) / static_cast<double>(simLength));
     std::cout << std::endl << "Success Probability: " << successProbability << "%";
-
-
-
 }
