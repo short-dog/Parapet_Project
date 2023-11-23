@@ -14,14 +14,14 @@
 
 void Parapet::scenarioBuilder() {
     //gathering scenario data
-    std::cout << "Enter Current Monthly Spending or Type '0' to find: " << std::endl;
+    std::cout << "Enter Current Monthly Spending or Type '1' to find: " << std::endl;
     std::cin >> monthlySpending;
 
     if (monthlySpending == 0) {
         std::cout << "Enter Portfolio Value" << std::endl;
         std::cin >> initialPortfolioValue;
     } else {
-        std::cout << "Enter Portfolio Value or Type '0' to find: " << std::endl;
+        std::cout << "Enter Portfolio Value or Type '1' to find: " << std::endl;
         std::cin >> initialPortfolioValue;
     }
     std::cout << "How Much Are You Currently Contributing to This Account, Per Year?" << std::endl;
@@ -36,6 +36,8 @@ void Parapet::scenarioBuilder() {
 
     std::cout << "Enter the file path to your portfolio: " << std::endl;
     std::cin >> filePath;
+
+    portfolioValue = initialPortfolioValue;
 }
 struct Investment {
     std::string name;
@@ -133,7 +135,6 @@ void Parapet::runMonteCarlo() {
     returnNeeded = yearlySpending - yearlyGain;
 
     //calculating final portfolio results
-    portfolioValue = initialPortfolioValue;
     for (int i = 0; i < simLength; ++i){
         double endValue = portfolioValue;
         for (int ii = 0 + i; ii < years * simLength; ii += simLength) {
@@ -142,14 +143,14 @@ void Parapet::runMonteCarlo() {
                 endValue += yearlyAddition;
             }
             if (ii > planLength * 1000 - 1000) {
-                double adjustedSpending = yearlySpending * pow((1 + inflationRate),ii/1000);
+                double adjustedSpending = yearlySpending * pow(1 + inflationRate,ii/1000);
                 endValue -= adjustedSpending;
             }
         }
         finalReturn.push_back(endValue);
     }
 }
-void Parapet::calculateSuccess() {
+void Parapet::calculateInitialSuccess() {
     //determine success probability of plan
     int successCount = 0;
     for (double n : finalReturn) {
@@ -158,9 +159,18 @@ void Parapet::calculateSuccess() {
         }
     }
     successProbability = 100 * (static_cast<double>(successCount) / static_cast<double>(simLength));
-    if (monthlySpending != 0) {
-        std::cout << std::endl << "Success Probability: " << successProbability << "%" << std::endl;
+    if (monthlySpending != 1) {
+        std::cout << std::endl << "Success Probability with a Spending Level of $" << std::fixed << std::setprecision(0) << monthlySpending << ": " << successProbability << "%" << std::endl;
     }
+}void Parapet::calculateSuccess() {
+    //determine success probability of plan
+    int successCount = 0;
+    for (double n : finalReturn) {
+        if (n > 0) {
+            ++successCount;
+        }
+    }
+    successProbability = 100 * (static_cast<double>(successCount) / static_cast<double>(simLength));
 }
 void Parapet::clearData() {
     monteCarloData.clear();
@@ -169,7 +179,6 @@ void Parapet::clearData() {
 }
 void Parapet::findSpending() {
     //find optimal spending level
-    successLevel = 90;
     if(monthlySpending == 0) {
         monthlySpending += 10000;
     }
@@ -184,7 +193,68 @@ void Parapet::findSpending() {
             runMonteCarlo();
             calculateSuccess();
         }
-        std::cout << std::endl << "Success Probability: " << successProbability << "%" << std::endl;
-        std::cout << "Suggested Monthly Spending: $" << monthlySpending << std::endl;
     }
+    std::cout << std::endl << "Success Probability: " << successProbability << "%" << std::endl;
+    std::cout << "Suggested Monthly Spending: $" << monthlySpending << std::endl;
+}
+void Parapet::findPortfolioNeeded() {
+    //find needed amount to support spending
+    while(successProbability < successLevel - 1) {
+        if (successProbability < successLevel - 80){
+            clearData();
+            portfolioValue += 25000;
+            runMonteCarlo();
+            calculateSuccess();
+        }
+        else if (successProbability < successLevel - 65){
+            clearData();
+            portfolioValue += 15000;
+            runMonteCarlo();
+            calculateSuccess();
+        }
+        else if (successProbability < successLevel - 40){
+            clearData();
+            portfolioValue += 7500;
+            runMonteCarlo();
+            calculateSuccess();
+        }
+        else if (successProbability < successLevel - 15){
+            clearData();
+            portfolioValue += 1500;
+            runMonteCarlo();
+            calculateSuccess();
+        }
+        else if (successProbability < successLevel - 7.5){
+            clearData();
+            portfolioValue += 500;
+            runMonteCarlo();
+            calculateSuccess();
+        }
+        else if (successProbability < successLevel - 1){
+            clearData();
+            portfolioValue += 100;
+            runMonteCarlo();
+            calculateSuccess();
+        }
+        while(successProbability > successLevel + 1) {
+            clearData();
+            portfolioValue -= 100;
+            runMonteCarlo();
+            calculateSuccess();
+            }
+    }
+}
+void Parapet::switchFinder() {
+    switch(static_cast<int>(initialPortfolioValue)) {
+        case 1:
+            findPortfolioNeeded();
+    }
+    switch(static_cast<int>(monthlySpending)) {
+        case 1:
+            findSpending();
+    }
+}
+void Parapet::printResults() const {
+    std::cout << std::endl << "Success Probability: " << std::setprecision(0) << successLevel << "%" << std::endl;
+    std::cout << "Suggested Portfolio Amount: $" << std::fixed << std::setprecision(0) << portfolioValue - 1 << std::endl;
 }

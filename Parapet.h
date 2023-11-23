@@ -12,9 +12,13 @@ public:
     void scenarioBuilder();
     void processPortfolio();
     void runMonteCarlo();
+    void calculateInitialSuccess();
     void calculateSuccess();
     void clearData();
     void findSpending();
+    void findPortfolioNeeded();
+    void switchFinder();
+    void printResults() const;
 
     std::string filePath;
     double monthlySpending;
@@ -40,11 +44,11 @@ private:
     double portfolioValue;
     double successConfirm;
     double successProbability;
-    int successLevel;
 
     int simLength = 1000;
     int lifeExpectancy = 95;
     double inflationRate = 0.03;
+    double successLevel = 90;
 
     std::vector<double> monteCarloData{};
     std::vector<double> planResults{};

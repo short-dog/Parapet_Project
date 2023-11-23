@@ -8,8 +8,10 @@ int main(){
     run1.scenarioBuilder();
     run1.processPortfolio();
     run1.runMonteCarlo();
+    run1.calculateInitialSuccess();
     run1.calculateSuccess();
-    run1.findSpending();
+    run1.switchFinder();
+    run1.printResults();
 
     return 1;
 }
