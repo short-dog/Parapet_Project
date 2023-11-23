@@ -13,6 +13,8 @@ public:
     void processPortfolio();
     void runMonteCarlo();
     void calculateSuccess();
+    void clearData();
+    void findSpending();
 
     std::string filePath;
     double monthlySpending;
@@ -37,11 +39,15 @@ private:
     double returnNeeded;
     double portfolioValue;
     double successConfirm;
+    double successProbability;
+    int successLevel;
 
     int simLength = 1000;
     int lifeExpectancy = 95;
     double inflationRate = 0.03;
 
+    std::vector<double> monteCarloData{};
+    std::vector<double> planResults{};
     std::vector<double> finalReturn{};
 
     struct Investment {

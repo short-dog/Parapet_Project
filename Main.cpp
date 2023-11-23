@@ -9,6 +9,7 @@ int main(){
     run1.processPortfolio();
     run1.runMonteCarlo();
     run1.calculateSuccess();
+    run1.findSpending();
 
     return 1;
 }

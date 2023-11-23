@@ -112,7 +112,6 @@ void Parapet::runMonteCarlo() {
     years = lifeExpectancy - planStartAge;
 
     //running simulation
-    std::vector<double> monteCarloData{};
     for (int i = 0; i < runNum; ++i) {
         std::uniform_real_distribution<> ParaMC(minMC, maxMC);
         std::random_device runSeed;
@@ -121,7 +120,6 @@ void Parapet::runMonteCarlo() {
         monteCarloData.push_back(x);
     }
     //calculating portfolio effect of each return
-    std::vector<double> planResults{};
     for (int sL = 0; sL < simLength; ++sL){
         for (int y = 0; y < years; ++y) {
             const int mCDN = y + y * sL;
@@ -154,11 +152,39 @@ void Parapet::runMonteCarlo() {
 void Parapet::calculateSuccess() {
     //determine success probability of plan
     int successCount = 0;
-    for (double n : finalReturn){
+    for (double n : finalReturn) {
         if (n > 0) {
             ++successCount;
         }
     }
-    const double successProbability = 100 * (static_cast<double>(successCount) / static_cast<double>(simLength));
-    std::cout << std::endl << "Success Probability: " << successProbability << "%";
+    successProbability = 100 * (static_cast<double>(successCount) / static_cast<double>(simLength));
+    if (monthlySpending != 0) {
+        std::cout << std::endl << "Success Probability: " << successProbability << "%" << std::endl;
+    }
+}
+void Parapet::clearData() {
+    monteCarloData.clear();
+    planResults.clear();
+    finalReturn.clear();
+}
+void Parapet::findSpending() {
+    //find optimal spending level
+    successLevel = 90;
+    if(monthlySpending == 0) {
+        monthlySpending += 10000;
+    }
+    while(successProbability < successLevel - 1) {
+        clearData();
+        monthlySpending *= 0.99;
+        runMonteCarlo();
+        calculateSuccess();
+        while(successProbability > successLevel + 1) {
+            clearData();
+            monthlySpending *= 1.01;
+            runMonteCarlo();
+            calculateSuccess();
+        }
+        std::cout << std::endl << "Success Probability: " << successProbability << "%" << std::endl;
+        std::cout << "Suggested Monthly Spending: $" << monthlySpending << std::endl;
+    }
 }
