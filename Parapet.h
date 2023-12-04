@@ -17,6 +17,9 @@ public:
     void clearData();
     void findSpending();
     void findPortfolioNeeded();
+
+    void findRetirementAge();
+
     void switchFinder();
     void printResults() const;
 
@@ -26,6 +29,7 @@ public:
     double yearlyAddition;
     int planStartAge;
     int retirementAge;
+
 
 private:
     int planLength;
@@ -44,11 +48,12 @@ private:
     double portfolioValue;
     double successConfirm;
     double successProbability;
+    int monteCarloRunCount = 0;
 
     int simLength = 1000;
     int lifeExpectancy = 95;
     double inflationRate = 0.03;
-    double successLevel = 90;
+    double successLevel = 68;
 
     std::vector<double> monteCarloData{};
     std::vector<double> planResults{};

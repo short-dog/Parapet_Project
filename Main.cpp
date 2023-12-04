@@ -11,7 +11,6 @@ int main(){
     run1.calculateInitialSuccess();
     run1.calculateSuccess();
     run1.switchFinder();
-    run1.printResults();
 
     return 1;
 }

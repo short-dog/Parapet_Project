@@ -1,6 +1,5 @@
 //
 // Created by BSHORT2 on 11/16/2023.
-//
 
 #include "Parapet.h"
 #include <iostream>
@@ -17,7 +16,7 @@ void Parapet::scenarioBuilder() {
     std::cout << "Enter Current Monthly Spending or Type '1' to find: " << std::endl;
     std::cin >> monthlySpending;
 
-    if (monthlySpending == 0) {
+    if (monthlySpending == 1) {
         std::cout << "Enter Portfolio Value" << std::endl;
         std::cin >> initialPortfolioValue;
     } else {
@@ -30,7 +29,7 @@ void Parapet::scenarioBuilder() {
     std::cout << "Enter Current Age: " << std::endl;
     std::cin >> planStartAge;
 
-    std::cout << "Enter Retirement Age or Type '0' to find: " << std::endl;
+    std::cout << "Enter Retirement Age or Type '1' to find: " << std::endl;
     std::cin >> retirementAge;
     planLength = retirementAge - planStartAge;
 
@@ -38,6 +37,7 @@ void Parapet::scenarioBuilder() {
     std::cin >> filePath;
 
     portfolioValue = initialPortfolioValue;
+    yearlySpending = monthlySpending * 12;
 }
 struct Investment {
     std::string name;
@@ -114,6 +114,7 @@ void Parapet::runMonteCarlo() {
     years = lifeExpectancy - planStartAge;
 
     //running simulation
+    monteCarloRunCount++;
     for (int i = 0; i < runNum; ++i) {
         std::uniform_real_distribution<> ParaMC(minMC, maxMC);
         std::random_device runSeed;
@@ -130,7 +131,6 @@ void Parapet::runMonteCarlo() {
             planResults.push_back(yy);
         }
     }
-    yearlySpending = 12 * monthlySpending;
     yearlyGain = portfolioReturn * 0.01 * portfolioValue;
     returnNeeded = yearlySpending - yearlyGain;
 
@@ -138,7 +138,7 @@ void Parapet::runMonteCarlo() {
     for (int i = 0; i < simLength; ++i){
         double endValue = portfolioValue;
         for (int ii = 0 + i; ii < years * simLength; ii += simLength) {
-            endValue *= planResults.at(ii);
+            endValue *= planResults[ii];
             if (ii < planLength * 1000 - 1000) {
                 endValue += yearlyAddition;
             }
@@ -179,23 +179,52 @@ void Parapet::clearData() {
 }
 void Parapet::findSpending() {
     //find optimal spending level
-    if(monthlySpending == 0) {
-        monthlySpending += 10000;
-    }
-    while(successProbability < successLevel - 1) {
-        clearData();
-        monthlySpending *= 0.99;
-        runMonteCarlo();
-        calculateSuccess();
+    while(successProbability > successLevel + 1 || successProbability < successLevel - 1) {
+        if (successProbability < successLevel - 80){
+            clearData();
+            yearlySpending *= 0.5;
+            runMonteCarlo();
+            calculateSuccess();
+        }
+        else if (successProbability < successLevel - 65){
+            clearData();
+            yearlySpending *= 0.6;
+            runMonteCarlo();
+            calculateSuccess();
+        }
+        else if (successProbability < successLevel - 40){
+            clearData();
+            yearlySpending *= 0.7;
+            runMonteCarlo();
+            calculateSuccess();
+        }
+        else if (successProbability < successLevel - 15){
+            clearData();
+            yearlySpending *= 0.8;
+            runMonteCarlo();
+            calculateSuccess();
+        }
+        else if (successProbability < successLevel - 7.5){
+            clearData();
+            yearlySpending *= 0.9;
+            runMonteCarlo();
+            calculateSuccess();
+        }
+        else if (successProbability < successLevel - 1){
+            clearData();
+            yearlySpending *= 0.99;
+            runMonteCarlo();
+            calculateSuccess();
+        }
         while(successProbability > successLevel + 1) {
             clearData();
-            monthlySpending *= 1.01;
+            yearlySpending *= 10;
             runMonteCarlo();
             calculateSuccess();
         }
     }
     std::cout << std::endl << "Success Probability: " << successProbability << "%" << std::endl;
-    std::cout << "Suggested Monthly Spending: $" << monthlySpending << std::endl;
+    std::cout << "Suggested Monthly Spending: $" << yearlySpending / 12 << std::endl;
 }
 void Parapet::findPortfolioNeeded() {
     //find needed amount to support spending
@@ -244,6 +273,60 @@ void Parapet::findPortfolioNeeded() {
             }
     }
 }
+void Parapet::findRetirementAge() {
+    //find retirement age for current portfolio and spending level
+    while(successProbability < successLevel - 1) {
+        if (successProbability < successLevel - 80){
+            clearData();
+            retirementAge += 25;
+            planLength = retirementAge - planStartAge;
+            runMonteCarlo();
+            calculateSuccess();
+        }
+        else if (successProbability < successLevel - 65){
+            clearData();
+            retirementAge += 20;
+            planLength = retirementAge - planStartAge;
+            runMonteCarlo();
+            calculateSuccess();
+        }
+        else if (successProbability < successLevel - 40){
+            clearData();
+            retirementAge += 15;
+            planLength = retirementAge - planStartAge;
+            runMonteCarlo();
+            calculateSuccess();
+        }
+        else if (successProbability < successLevel - 15){
+            clearData();
+            retirementAge += 10;
+            planLength = retirementAge - planStartAge;
+            runMonteCarlo();
+            calculateSuccess();
+        }
+        else if (successProbability < successLevel - 7.5){
+            clearData();
+            retirementAge += 5;
+            planLength = retirementAge - planStartAge;
+            runMonteCarlo();
+            calculateSuccess();
+        }
+        else if (successProbability < successLevel - 1){
+            clearData();
+            retirementAge += 1;
+            planLength = retirementAge - planStartAge;
+            runMonteCarlo();
+            calculateSuccess();
+        }
+        while(successProbability > successLevel + 1) {
+            clearData();
+            retirementAge -= 1;
+            planLength = retirementAge - planStartAge;
+            runMonteCarlo();
+            calculateSuccess();
+            }
+    }
+}
 void Parapet::switchFinder() {
     switch(static_cast<int>(initialPortfolioValue)) {
         case 1:
@@ -253,8 +336,17 @@ void Parapet::switchFinder() {
         case 1:
             findSpending();
     }
+    switch(retirementAge) {
+        case 1:
+            findRetirementAge();
+    }
+    if(initialPortfolioValue && monthlySpending && retirementAge > 0) {
+        printResults();
+    }
 }
 void Parapet::printResults() const {
-    std::cout << std::endl << "Success Probability: " << std::setprecision(0) << successLevel << "%" << std::endl;
+    std::cout << std::endl << "Success Probability: " << std::fixed << std::setprecision(0) << successLevel << "%" << std::endl;
     std::cout << "Suggested Portfolio Amount: $" << std::fixed << std::setprecision(0) << portfolioValue - 1 << std::endl;
+    std::cout << "Suggested Retirement Age: " << std::fixed << std::setprecision(0) << retirementAge << std::endl;
+    std::cout << "Numbers of Times Monte Carlo Run: " << std::fixed << monteCarloRunCount << std::endl;
 }
