@@ -10,6 +10,8 @@ add_executable(Parapet_Project
         .idea/modules.xml
         ".idea/Parapet Project.iml"
         .idea/workspace.xml
-        Main.cpp
-        Parapet.cpp
-        Parapet.h)
+        App/Main.cpp
+        src/Parapet.cpp
+        src/Parapet.h
+        src/Perimeter.cpp
+        src/Perimeter.h)

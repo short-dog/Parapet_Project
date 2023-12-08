@@ -17,13 +17,15 @@ public:
     void clearData();
     void findSpending();
     void findPortfolioNeeded();
-
+    void getFilePath();
     void findRetirementAge();
-
     void switchFinder();
     void printResults() const;
+    static void runProgram();
 
     std::string filePath;
+    std::ifstream file();
+
     double monthlySpending;
     double initialPortfolioValue;
     double yearlyAddition;
@@ -46,14 +48,15 @@ private:
     double yearlyGain;
     double returnNeeded;
     double portfolioValue;
+
     double successConfirm;
     double successProbability;
     int monteCarloRunCount = 0;
 
     int simLength = 1000;
-    int lifeExpectancy = 95;
+    int lifeExpectancy = 95; //don't allow findAge to surpass
     double inflationRate = 0.03;
-    double successLevel = 68;
+    double successLevel = 90;
 
     std::vector<double> monteCarloData{};
     std::vector<double> planResults{};
@@ -65,6 +68,10 @@ private:
         double stdDeviation;
         double portionOfPortfolio;
     };
+
+    bool portfolioSwitch = false;
+    bool spendingSwitch = false;
+    bool retirementSwitch = false;
 };
 
 #endif //PARAPET_H

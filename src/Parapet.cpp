@@ -10,6 +10,7 @@
 #include <sstream>
 #include <iomanip>
 #include <random>
+#include <set>
 
 void Parapet::scenarioBuilder() {
     //gathering scenario data
@@ -31,13 +32,29 @@ void Parapet::scenarioBuilder() {
 
     std::cout << "Enter Retirement Age or Type '1' to find: " << std::endl;
     std::cin >> retirementAge;
+
+    while (retirementAge <= planStartAge) {
+        while (retirementAge != 1){
+            std::cout << "Input Error: Please enter an age above current age." << std::endl;
+            std::cout << "Enter Retirement Age or Type '1' to find: " << std::endl;
+            std::cin >> retirementAge;
+        }
+        break;
+    }
+    while (retirementAge >= lifeExpectancy) {
+        std::cout << "Input Error: Please enter an age lower than life expectancy of: " << lifeExpectancy << std::endl;
+        std::cout << "Enter Retirement Age or Type '1' to find: " << std::endl;
+        std::cin >> retirementAge;
+    }
+
     planLength = retirementAge - planStartAge;
-
-    std::cout << "Enter the file path to your portfolio: " << std::endl;
-    std::cin >> filePath;
-
     portfolioValue = initialPortfolioValue;
     yearlySpending = monthlySpending * 12;
+
+}
+void Parapet::getFilePath() {
+    std::cout << "Enter the file path to your portfolio: " << std::endl;
+    std::cin >> filePath;
 }
 struct Investment {
     std::string name;
@@ -49,8 +66,10 @@ void Parapet::processPortfolio() {
     // Retrieving User Portfolio and Formatting it //
     // Retrieving the portfolio from a CSV file
     std::ifstream file(filePath);
-    if (!file.is_open()) {
-        std::cerr << "Error: Could not open file." << std::endl;
+    while(!file.is_open()) {
+        std::cerr << "Error: Could not open file. Please retry." << std::endl;
+        getFilePath();
+        std::ifstream file(filePath);
     }
 
     //Establishing structure for the CSV info
@@ -100,7 +119,7 @@ void Parapet::processPortfolio() {
 
     std::cout << "\nOverall Portfolio Metrics:" << std::endl;
     std::cout << "Overall Performance: " << std::setprecision(4) << portfolioReturn << "%" << std::endl;
-    std::cout << "Overall Standard Deviation: " << std::setprecision(4) << portfolioStdDev << "%" << std::endl;
+    std::cout << "Overall Standard Deviation: " << std::setprecision(4) << portfolioStdDev << "%\n" << std::endl;
 
     //establishing portfolio parameters for Monte Carlo Simulation
     minMC = portfolioReturn - portfolioStdDev;
@@ -159,10 +178,11 @@ void Parapet::calculateInitialSuccess() {
         }
     }
     successProbability = 100 * (static_cast<double>(successCount) / static_cast<double>(simLength));
-    if (monthlySpending != 1) {
-        std::cout << std::endl << "Success Probability with a Spending Level of $" << std::fixed << std::setprecision(0) << monthlySpending << ": " << successProbability << "%" << std::endl;
+    if (monthlySpending != 1 && initialPortfolioValue != 1 && retirementAge != 1) {
+        std::cout << std::endl << "Success Probability of " << successProbability << "% with: \n Spending Level of $" << std::fixed << std::setprecision(0) << monthlySpending << "\n Portfolio Value of: $" << initialPortfolioValue << "\n and a Retirement Age of: " << retirementAge << std::endl;
     }
-}void Parapet::calculateSuccess() {
+}
+void Parapet::calculateSuccess() {
     //determine success probability of plan
     int successCount = 0;
     for (double n : finalReturn) {
@@ -223,8 +243,6 @@ void Parapet::findSpending() {
             calculateSuccess();
         }
     }
-    std::cout << std::endl << "Success Probability: " << successProbability << "%" << std::endl;
-    std::cout << "Suggested Monthly Spending: $" << yearlySpending / 12 << std::endl;
 }
 void Parapet::findPortfolioNeeded() {
     //find needed amount to support spending
@@ -318,6 +336,9 @@ void Parapet::findRetirementAge() {
             runMonteCarlo();
             calculateSuccess();
         }
+        else if (retirementAge >= lifeExpectancy) {
+            printResults();
+        }
         while(successProbability > successLevel + 1) {
             clearData();
             retirementAge -= 1;
@@ -331,22 +352,52 @@ void Parapet::switchFinder() {
     switch(static_cast<int>(initialPortfolioValue)) {
         case 1:
             findPortfolioNeeded();
+            portfolioSwitch = true;
     }
     switch(static_cast<int>(monthlySpending)) {
         case 1:
             findSpending();
+            spendingSwitch = true;
     }
     switch(retirementAge) {
         case 1:
             findRetirementAge();
+            retirementSwitch = true;
+
     }
-    if(initialPortfolioValue && monthlySpending && retirementAge > 0) {
+    if(1 > initialPortfolioValue && monthlySpending && retirementAge > 1) {
         printResults();
     }
 }
 void Parapet::printResults() const {
-    std::cout << std::endl << "Success Probability: " << std::fixed << std::setprecision(0) << successLevel << "%" << std::endl;
-    std::cout << "Suggested Portfolio Amount: $" << std::fixed << std::setprecision(0) << portfolioValue - 1 << std::endl;
-    std::cout << "Suggested Retirement Age: " << std::fixed << std::setprecision(0) << retirementAge << std::endl;
+    if (portfolioSwitch == true || spendingSwitch == true || retirementSwitch == true) {
+        std::cout << "Success Probability Set: " << std::fixed << std::setprecision(0) << successLevel << "%\n";
+        std::cout << "Success Probability Achieved: " << std::fixed << std::setprecision(0) << successProbability << "%\n" << std::endl;
+    }
+    if (portfolioSwitch == true) {
+        std::cout << "Suggested Portfolio Amount: $" << std::fixed << std::setprecision(0) << portfolioValue << "\n";
+        std::cout << "Monthly Spending of: $" << std::fixed << std::setprecision(0) << yearlySpending/12 << "\n";
+        std::cout << "Retirement Age of: " << std::fixed << std::setprecision(0) << retirementAge << std::endl;
+    }
+    if (spendingSwitch == true) {
+        std::cout << "Suggested Monthly Spending: $" << std::fixed << std::setprecision(0) << yearlySpending/12 << std::endl;
+        std::cout << "Portfolio Value of: $" << std::fixed << std::setprecision(0) << portfolioValue << std::endl;
+        std::cout << "Retirement Age of: " << std::fixed << std::setprecision(0) << retirementAge << std::endl;
+    }
+    if (retirementSwitch == true) {
+        std::cout << "Suggested Retirement Age: " << std::fixed << std::setprecision(0) << retirementAge << std::endl;
+        std::cout << "Portfolio Value of: $" << std::fixed << std::setprecision(0) << portfolioValue << std::endl;
+        std::cout << "Monthly Spending of: $" << std::fixed << std::setprecision(0) << yearlySpending/12 << "\n";
+    }
     std::cout << "Numbers of Times Monte Carlo Run: " << std::fixed << monteCarloRunCount << std::endl;
+}
+void Parapet::runProgram() {
+    Parapet run1;
+    run1.scenarioBuilder();
+    run1.getFilePath();
+    run1.processPortfolio();
+    run1.runMonteCarlo();
+    run1.calculateInitialSuccess();
+    run1.calculateSuccess();
+    run1.switchFinder();
 }
