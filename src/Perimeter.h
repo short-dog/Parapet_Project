@@ -4,11 +4,11 @@
 
 #ifndef PERIMETER_H
 #define PERIMETER_H
-#include <list>
 #include <string>
 
 
 class Perimeter {
+public:
     double targetBudget;
     double totalMonthlyExpenses;
     struct expenseItem {
@@ -31,7 +31,19 @@ class Perimeter {
 
     void addNewExpense(expenseItem);
 
-    void showTotalMonthlyExpenses();
+ /* newItem.expenseName = "Fortnite Battle Pass";
+    newItem.expenseMerchant = "Epic Games, Inc.";
+    newItem.year = 2023;
+    newItem.month = 12;
+    newItem.day = 6;
+    newItem.hour = 21;
+    newItem.minute = 31;
+    newItem.second = 26;
+    newItem.expenseCost = 9.99;
+    newItem.expenseCategory = "Gaming";
+    newItem.isRecurring = false;
+    newItem.expenseFundingLocation = "PayPal";
+    newItem.isTaxRelevant = false; */
 };
 
 
