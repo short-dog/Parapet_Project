@@ -6,6 +6,7 @@
 #define PARAPET_H
 #include <vector>
 #include <iostream>
+#include <map>
 
 class Parapet {
 public:
@@ -39,6 +40,9 @@ private:
     double yearlyAddition;
     double planStartAge;
     double retirementAge;
+    std::string socialEligibleStr;
+    bool socialEligible;
+    int socialAge;
     int planLength;
 
 
@@ -54,6 +58,7 @@ private:
     double yearlyGain;
     double returnNeeded;
     double portfolioValue;
+    double totalAvgValue = 0;
 
     double successConfirm;
     double successProbability;
@@ -71,6 +76,10 @@ private:
     bool portfolioSwitch = false;
     bool spendingSwitch = false;
     bool retirementSwitch = false;
+
+    std::map<double, double> socialSecurityBenefit = {{62, 1125},{63, 1200},
+        {64, 1298},{65, 1401},{66, 1500},{67, 1620},{68, 1740},{69, 1860}
+    };
 };
 
 #endif //PARAPET_H
