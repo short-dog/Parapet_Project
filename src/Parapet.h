@@ -9,6 +9,8 @@
 
 class Parapet {
 public:
+    static void runParapet();
+private:
     void scenarioBuilder();
     void processPortfolio();
     void runMonteCarlo();
@@ -21,20 +23,24 @@ public:
     void findRetirementAge();
     void switchFinder();
     void printResults() const;
-    static void runProgram();
+    struct Investment {
+        std::string name;
+        double rateOfReturn;
+        double stdDeviation;
+        double portionOfPortfolio;
+    };
 
+private:
     std::string filePath;
     std::ifstream file();
 
     double monthlySpending;
     double initialPortfolioValue;
     double yearlyAddition;
-    int planStartAge;
-    int retirementAge;
-
-
-private:
+    double planStartAge;
+    double retirementAge;
     int planLength;
+
 
     double portfolioReturn;
     double portfolioStdDev;
@@ -61,13 +67,6 @@ private:
     std::vector<double> monteCarloData{};
     std::vector<double> planResults{};
     std::vector<double> finalReturn{};
-
-    struct Investment {
-        std::string name;
-        double rateOfReturn;
-        double stdDeviation;
-        double portionOfPortfolio;
-    };
 
     bool portfolioSwitch = false;
     bool spendingSwitch = false;

@@ -4,14 +4,6 @@
 #include "src/Parapet.h"
 
 int main(){
-    windowSettings settings;
-    settings.setsize(1024, 768);
-    settings.windowMode = windowed;
-
-    auto window = createWindow(settings);
-
-    runApp(window, std::make_shared<Parapet>());
-    runProgram();
-
+    Parapet::runParapet();
     return 1;
 }

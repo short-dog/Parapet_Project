@@ -356,16 +356,17 @@ void Parapet::switchFinder() {
     }
     switch(static_cast<int>(monthlySpending)) {
         case 1:
+            yearlySpending = yearlyAddition * retirementAge;
             findSpending();
             spendingSwitch = true;
     }
-    switch(retirementAge) {
+    switch(static_cast<int>(retirementAge)) {
         case 1:
             findRetirementAge();
             retirementSwitch = true;
 
     }
-    if(1 > initialPortfolioValue && monthlySpending && retirementAge > 1) {
+    if(initialPortfolioValue && monthlySpending && retirementAge > 1) {
         printResults();
     }
 }
@@ -391,7 +392,7 @@ void Parapet::printResults() const {
     }
     std::cout << "Numbers of Times Monte Carlo Run: " << std::fixed << monteCarloRunCount << std::endl;
 }
-void Parapet::runProgram() {
+void Parapet::runParapet() {
     Parapet run1;
     run1.scenarioBuilder();
     run1.getFilePath();
