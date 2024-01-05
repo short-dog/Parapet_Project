@@ -1,12 +1,9 @@
 //
 // Created by Ben Short on 12/6/23.
 //
-
 #include "Perimeter.h"
-
 #include <iomanip>
 #include <iostream>
-#include <numeric>
 
 void Perimeter::addNewExpense(expenseItem newExpense){
     totalMonthlyExpenses += newExpense.expenseCost;

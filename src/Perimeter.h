@@ -1,11 +1,9 @@
 //
 // Created by Ben Short on 12/6/23.
 //
-
 #ifndef PERIMETER_H
 #define PERIMETER_H
 #include <string>
-
 
 class Perimeter {
 public:

@@ -5,6 +5,7 @@
 #include "src/Perimeter.h"
 
 int main() {
+    //Parapet::runMultiParapet(100);
     Parapet::runParapet();
     return 1;
 }

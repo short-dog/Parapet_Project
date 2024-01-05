@@ -1,7 +1,6 @@
 //
 // Created by BSHORT2 on 11/16/2023.
 //
-
 #ifndef PARAPET_H
 #define PARAPET_H
 #include <vector>
@@ -11,19 +10,36 @@
 class Parapet {
 public:
     static void runParapet();
+
+    static void runMultiParapet(int runNumber);
+
+    void calcAvgSuccess();
+
 private:
     void scenarioBuilder();
     void processPortfolio();
+
+    void printPortfolioStats();
+
     void runMonteCarlo();
     void calculateInitialSuccess();
+
+    void printInitialSuccess();
+
     void calculateSuccess();
     void clearData();
     void findSpending();
     void findPortfolioNeeded();
     void getFilePath();
+
+    void presetScenario();
+
     void findRetirementAge();
     void switchFinder();
     void printResults() const;
+
+    void logData();
+    void clearRunData();
     struct Investment {
         std::string name;
         double rateOfReturn;
@@ -72,10 +88,13 @@ private:
     std::vector<double> monteCarloData{};
     std::vector<double> planResults{};
     std::vector<double> finalReturn{};
+    std::vector<Investment> investments;
+
 
     bool portfolioSwitch = false;
     bool spendingSwitch = false;
     bool retirementSwitch = false;
+    bool printResultsBool = false;
 
     std::map<double, double> socialSecurityBenefit = {{62, 1125},{63, 1200},
         {64, 1298},{65, 1401},{66, 1500},{67, 1620},{68, 1740},{69, 1860}

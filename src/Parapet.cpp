@@ -1,6 +1,6 @@
 //
 // Created by BSHORT2 on 11/16/2023.
-
+//
 #include "Parapet.h"
 #include <iostream>
 #include <cmath>
@@ -71,6 +71,18 @@ void Parapet::getFilePath() {
     std::cout << "Enter the file path to your portfolio: " << std::endl;
     std::cin >> filePath;
 }
+void Parapet::presetScenario() {
+    monthlySpending = 7500;
+    initialPortfolioValue = 25000;
+    yearlyAddition = 10000;
+    planStartAge = 25;
+    retirementAge = 65;
+    socialAge = 70;
+    planLength = retirementAge - planStartAge;
+    portfolioValue = initialPortfolioValue;
+    yearlySpending = monthlySpending * 12;
+    filePath = "/Users/short/CLionProjects/Parapet_Project/src/investments.csv";
+}
 struct Investment {
     std::string name;
     double rateOfReturn;
@@ -87,7 +99,6 @@ void Parapet::processPortfolio() {
         std::ifstream file(filePath);
     }
     //Establishing structure for the CSV info
-    std::vector<Investment> investments;
     double totalPortfolioValue = 0.0;
     std::string line;
     getline(file, line);
@@ -109,7 +120,7 @@ void Parapet::processPortfolio() {
             investment.portionOfPortfolio = std::stod(columns[3]);
             totalPortfolioValue += investment.portionOfPortfolio;
             investments.push_back(investment);
-        } else {
+        }else {
             std::cerr << "Error: Invalid CSV format." << std::endl;
         }
     }
@@ -118,22 +129,22 @@ void Parapet::processPortfolio() {
         portfolioReturn += investment.rateOfReturn * (investment.portionOfPortfolio / totalPortfolioValue);
         portfolioStdDev += pow(investment.stdDeviation, 2) * (investment.portionOfPortfolio / totalPortfolioValue);
     }
-
-    portfolioStdDev = sqrt(portfolioStdDev);
-    // Print individual investments and overall portfolio stats
-    std::cout << std::endl << "Individual Investments:" << std::endl;
-    for (const Investment &investment: investments) {
-        std::cout << "Name: " << investment.name << ", Rate of Return: " << investment.rateOfReturn << "%"
-                  << ", Standard Deviation: " << investment.stdDeviation << "%"
-                  << ", Portion of Portfolio: " << investment.portionOfPortfolio << std::endl;
-    }
-
-    std::cout << "\nOverall Portfolio Metrics:" << std::endl;
-    std::cout << "Overall Performance: " << std::setprecision(4) << portfolioReturn << "%" << std::endl;
-    std::cout << "Overall Standard Deviation: " << std::setprecision(4) << portfolioStdDev << std::endl;
     //establishing portfolio parameters for Monte Carlo Simulation
+    portfolioStdDev = sqrt(portfolioStdDev);
     minMC = portfolioReturn - portfolioStdDev;
     maxMC = portfolioReturn + portfolioStdDev;
+}
+void Parapet::printPortfolioStats(){ // Print individual investments and overall portfolio stats
+        std::cout << std::endl << "Individual Investments:" << std::endl;
+        for (const Investment &investment: investments) {
+            std::cout << "Name: " << investment.name << ", Rate of Return: " << investment.rateOfReturn << "%"
+                      << ", Standard Deviation: " << investment.stdDeviation << "%"
+                      << ", Portion of Portfolio: " << investment.portionOfPortfolio << std::endl;
+        }
+
+        std::cout << "\nOverall Portfolio Metrics:" << std::endl;
+        std::cout << "Overall Performance: " << std::setprecision(4) << portfolioReturn << "%" << std::endl;
+        std::cout << "Overall Standard Deviation: " << std::setprecision(4) << portfolioStdDev << std::endl;
 }
 
 void Parapet::runMonteCarlo() {
@@ -203,10 +214,15 @@ void Parapet::calculateInitialSuccess() {
         }
     }
     successProbability = 100 * (static_cast<double>(successCount) / static_cast<double>(simLength));
-    if (monthlySpending != 1 && initialPortfolioValue != 1 && retirementAge != 1) {
-        std::cout << std::endl << "Success Probability of " << successProbability << "% with: \nSpending Level of $" << std::fixed << std::setprecision(0) << monthlySpending << "\nPortfolio Value of: $" << initialPortfolioValue << "\nand a Retirement Age of: " << retirementAge << std::endl;
-    }
 }
+void Parapet::printInitialSuccess() {
+        if (monthlySpending != 1 && initialPortfolioValue != 1 && retirementAge != 1) {
+            std::cout << std::endl << "Success Probability of " << successProbability << "% with: \nSpending Level of $"
+            << std::fixed << std::setprecision(0) << monthlySpending << "\nPortfolio Value of: $" << initialPortfolioValue
+            << "\nand a Retirement Age of: " << retirementAge << std::endl;
+        }
+}
+
 void Parapet::calculateSuccess() {
     //determine success probability of plan
     int successCount = 0;
@@ -396,35 +412,80 @@ void Parapet::switchFinder() {
     }
 }
 void Parapet::printResults() const {
-    if (portfolioSwitch == true || spendingSwitch == true || retirementSwitch == true) {
-        std::cout << "Success Probability Set: " << std::fixed << std::setprecision(0) << successLevel << "%\n";
-        std::cout << "Success Probability Achieved: " << std::fixed << std::setprecision(0) << successProbability << "%\n" << std::endl;
+    if (printResultsBool == true){
+        if (portfolioSwitch == true || spendingSwitch == true || retirementSwitch == true) {
+            std::cout << "Success Probability Set: " << std::fixed << std::setprecision(0) << successLevel << "%\n";
+            std::cout << "Success Probability Achieved: " << std::fixed << std::setprecision(0) << successProbability
+            << "%\n" << std::endl;
+        }
+        if (portfolioSwitch == true) {
+            std::cout << "Suggested Portfolio Amount: $" << std::fixed << std::setprecision(0) << portfolioValue << "\n";
+            std::cout << "Monthly Spending of: $" << std::fixed << std::setprecision(0) << yearlySpending/12 << "\n";
+            std::cout << "Retirement Age of: " << std::fixed << std::setprecision(0) << retirementAge << std::endl;
+        }
+        if (spendingSwitch == true) {
+            std::cout << "Suggested Monthly Spending: $" << std::fixed << std::setprecision(0) << yearlySpending/12
+            << "\n";
+            std::cout << "Portfolio Value of: $" << std::fixed << std::setprecision(0) << portfolioValue << "\n";
+            std::cout << "Retirement Age of: " << std::fixed << std::setprecision(0) << retirementAge << std::endl;
+        }
+        if (retirementSwitch == true) {
+            std::cout << "Suggested Retirement Age: " << std::fixed << std::setprecision(0) << retirementAge << "\n";
+            std::cout << "Portfolio Value of: $" << std::fixed << std::setprecision(0) << portfolioValue << "\n";
+            std::cout << "Monthly Spending of: $" << std::fixed << std::setprecision(0) << yearlySpending/12 << std::endl;
+        }
+        std::cout << "\nNumbers of Times Monte Carlo Run: " << std::fixed << monteCarloRunCount << ", Iterations per Run: "
+        << simLength << "\n";
+        std::cout << "Average Ending Portfolio Value: $" << std::fixed << totalAvgValue / (simLength*monteCarloRunCount) << std::endl;
     }
-    if (portfolioSwitch == true) {
-        std::cout << "Suggested Portfolio Amount: $" << std::fixed << std::setprecision(0) << portfolioValue << "\n";
-        std::cout << "Monthly Spending of: $" << std::fixed << std::setprecision(0) << yearlySpending/12 << "\n";
-        std::cout << "Retirement Age of: " << std::fixed << std::setprecision(0) << retirementAge << std::endl;
-    }
-    if (spendingSwitch == true) {
-        std::cout << "Suggested Monthly Spending: $" << std::fixed << std::setprecision(0) << yearlySpending/12 << "\n";
-        std::cout << "Portfolio Value of: $" << std::fixed << std::setprecision(0) << portfolioValue << "\n";
-        std::cout << "Retirement Age of: " << std::fixed << std::setprecision(0) << retirementAge << std::endl;
-    }
-    if (retirementSwitch == true) {
-        std::cout << "Suggested Retirement Age: " << std::fixed << std::setprecision(0) << retirementAge << "\n";
-        std::cout << "Portfolio Value of: $" << std::fixed << std::setprecision(0) << portfolioValue << "\n";
-        std::cout << "Monthly Spending of: $" << std::fixed << std::setprecision(0) << yearlySpending/12 << std::endl;
-    }
-    std::cout << "\nNumbers of Times Monte Carlo Run: " << std::fixed << monteCarloRunCount << ", Iterations per Run: " << simLength << "\n";
-    //std::cout << "Average Ending Portfolio Value: $" << std::fixed << totalAvgValue / simLength << std::endl;
+}
+void Parapet::logData() {
+    std::ofstream logFile("/Users/short/CLionProjects/Parapet_Project/src/log.csv", std::ios::app);
+    logFile << successProbability << "," << totalAvgValue/simLength << "," << successLevel << "," << monthlySpending << ","
+    << initialPortfolioValue << "," << yearlyAddition << "," << retirementAge << "," << planStartAge << "," << socialAge << "," << simLength
+    << "," << lifeExpectancy << "," << inflationRate << "," << monteCarloRunCount << "," << filePath << "\n";
+    logFile.close();
+}
+void Parapet::clearRunData() {
+    monteCarloData.clear();
+    planResults.clear();
+    finalReturn.clear();
+    investments.clear();
+    portfolioReturn = 0;
+    portfolioStdDev = 0;
+    totalAvgValue = 0;
 }
 void Parapet::runParapet() {
     Parapet run1;
+    run1.printResultsBool = true;
     run1.scenarioBuilder();
     run1.getFilePath();
     run1.processPortfolio();
+    run1.printPortfolioStats();
     run1.runMonteCarlo();
     run1.calculateInitialSuccess();
+    run1.printInitialSuccess();
     run1.calculateSuccess();
     run1.switchFinder();
+    run1.logData();
+    run1.clearRunData();
+}
+void Parapet::runMultiParapet(int runNumber) {
+    Parapet run1;
+    double sumSuccess = 0;
+    std::cout << "Running..." << std::endl;
+    for (int i = 0; i < runNumber; i++) {
+        run1.presetScenario();
+        run1.processPortfolio();
+        run1.runMonteCarlo();
+        run1.calculateInitialSuccess();
+        run1.calculateSuccess();
+        run1.switchFinder();
+        sumSuccess += run1.successProbability;
+        run1.logData();
+        run1.clearRunData();
+    }
+    double avgSuccess = sumSuccess / runNumber;
+    std::cout << "Complete." << "\n";
+    std::cout  << "Average Success Rate: " << std::setprecision(2) << avgSuccess << "%" << std::endl;
 }
