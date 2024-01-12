@@ -10,6 +10,8 @@
 #include <sstream>
 #include <iomanip>
 #include <random>
+#include <ranges>
+#include <algorithm>
 
 void Parapet::scenarioBuilder() {
     //gathering scenario data
@@ -72,11 +74,11 @@ void Parapet::getFilePath() {
     std::cin >> filePath;
 }
 void Parapet::presetScenario() {
-    monthlySpending = 7500;
-    initialPortfolioValue = 25000;
-    yearlyAddition = 10000;
-    planStartAge = 25;
-    retirementAge = 65;
+    monthlySpending = 5500;
+    initialPortfolioValue = 10000;
+    yearlyAddition = 12000;
+    planStartAge = 23;
+    retirementAge = 60;
     socialAge = 70;
     planLength = retirementAge - planStartAge;
     portfolioValue = initialPortfolioValue;
@@ -202,7 +204,7 @@ void Parapet::runMonteCarlo() {
             }
         }
         finalReturn.push_back(endValue);
-        totalAvgValue += endValue;
+        //totalAvgValue += endValue;
     }
 }
 void Parapet::calculateInitialSuccess() {
@@ -411,6 +413,20 @@ void Parapet::switchFinder() {
         printResults();
     }
 }
+void Parapet::findAverageEndValue() {
+    std::ranges::sort(finalReturn);
+    double totalMedValue = 0;
+    double totalAvgValue = 0;
+    const int i = finalReturn.size();
+    for (int ii = i*0.45; ii < i*0.55; ii++) {
+        totalMedValue += finalReturn[ii];
+    }
+    for (int ii = 0; ii < i; ii++) {
+        totalAvgValue += finalReturn[ii];
+    }
+    totalMedianEndValue += totalMedValue/(i*0.1);
+    totalAvgEndValue += totalAvgValue/(i);
+}
 void Parapet::printResults() const {
     if (printResultsBool == true){
         if (portfolioSwitch == true || spendingSwitch == true || retirementSwitch == true) {
@@ -436,12 +452,13 @@ void Parapet::printResults() const {
         }
         std::cout << "\nNumbers of Times Monte Carlo Run: " << std::fixed << monteCarloRunCount << ", Iterations per Run: "
         << simLength << "\n";
-        std::cout << "Average Ending Portfolio Value: $" << std::fixed << totalAvgValue / (simLength*monteCarloRunCount) << std::endl;
+        std::cout << "Average Ending Portfolio Value: $" << std::fixed << totalAvgEndValue / monteCarloRunCount << std::endl;
+        std::cout << "Median Ending Portfolio Value: $" << std::fixed << totalMedianEndValue / monteCarloRunCount << std::endl;
     }
 }
 void Parapet::logData() {
     std::ofstream logFile("/Users/short/CLionProjects/Parapet_Project/src/log.csv", std::ios::app);
-    logFile << successProbability << "," << totalAvgValue/simLength << "," << successLevel << "," << monthlySpending << ","
+    logFile << successProbability << "," << totalAvgEndValue << "," << successLevel << "," << monthlySpending << ","
     << initialPortfolioValue << "," << yearlyAddition << "," << retirementAge << "," << planStartAge << "," << socialAge << "," << simLength
     << "," << lifeExpectancy << "," << inflationRate << "," << monteCarloRunCount << "," << filePath << "\n";
     logFile.close();
@@ -453,19 +470,20 @@ void Parapet::clearRunData() {
     investments.clear();
     portfolioReturn = 0;
     portfolioStdDev = 0;
-    totalAvgValue = 0;
 }
 void Parapet::runParapet() {
     Parapet run1;
     run1.printResultsBool = true;
-    run1.scenarioBuilder();
-    run1.getFilePath();
+    //run1.scenarioBuilder();
+    //run1.getFilePath();
+    run1.presetScenario();
     run1.processPortfolio();
     run1.printPortfolioStats();
     run1.runMonteCarlo();
     run1.calculateInitialSuccess();
     run1.printInitialSuccess();
     run1.calculateSuccess();
+    run1.findAverageEndValue();
     run1.switchFinder();
     run1.logData();
     run1.clearRunData();

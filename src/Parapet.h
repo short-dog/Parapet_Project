@@ -36,6 +36,9 @@ private:
 
     void findRetirementAge();
     void switchFinder();
+
+    void findAverageEndValue();
+
     void printResults() const;
 
     void logData();
@@ -74,7 +77,8 @@ private:
     double yearlyGain;
     double returnNeeded;
     double portfolioValue;
-    double totalAvgValue = 0;
+    double totalMedianEndValue;
+    double totalAvgEndValue;
 
     double successConfirm;
     double successProbability;
@@ -85,9 +89,9 @@ private:
     double inflationRate = 0.03;
     double successLevel = 90;
 
-    std::vector<double> monteCarloData{};
-    std::vector<double> planResults{};
-    std::vector<double> finalReturn{};
+    std::vector<double> monteCarloData;
+    std::vector<double> planResults;
+    std::vector<double> finalReturn;
     std::vector<Investment> investments;
 
 

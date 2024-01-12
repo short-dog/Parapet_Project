@@ -4,6 +4,7 @@
 #ifndef PERIMETER_H
 #define PERIMETER_H
 #include <string>
+#include <vector>
 
 class Perimeter {
 public:
